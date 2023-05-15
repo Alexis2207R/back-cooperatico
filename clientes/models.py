@@ -10,3 +10,6 @@ class Cliente(models.Model):
     email = models.EmailField(max_length=250, verbose_name="Email", blank=True)
     email_1 = models.EmailField(max_length=250, verbose_name="Email 2", blank=True)
     email_2 = models.EmailField(max_length=250, verbose_name="Email 3", blank=True)
+
+    def __str__(self):
+        return self.nombre

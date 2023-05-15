@@ -10,6 +10,9 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 class TipoVehiculo(models.Model):
     nombre = models.CharField(max_length=100, verbose_name="Tipo de Vehiculo")
 
+    def __str__(self):
+        return self.nombre
+
 
 ######### Los vehiculos son de los transportistas #########
 class Vehiculos(models.Model):
@@ -25,11 +28,17 @@ class Vehiculos(models.Model):
     year = models.CharField(max_length=4, verbose_name="Año")
     color = models.CharField(max_length=100, verbose_name="Color")
 
+    def __str__(self):
+        return self.placa
+
 
 class Transportista(models.Model):
     tipo_documento = models.ForeignKey(TipoDocumento, verbose_name="Tipo de Documento", on_delete=models.CASCADE)
     numero_documento = models.CharField(max_length=11, verbose_name="Numero del Documento")
     nombre = models.CharField(max_length=200, verbose_name="Nombre")
+
+    def __str__(self):
+        return self.nombre
 
 
 class Yaer(models.Model):
@@ -87,6 +96,9 @@ class Guia(models.Model):
     def fecha_inicio_traslado(self):
         return self.fecha_inicio_traslado.strftime("%d-%m-%Y")
 
+    def __str__(self):
+        return self.tipo_comprobante
+
 
 class GuiaItems(models.Model):
     guia = models.ForeignKey(Guia, on_delete=models.CASCADE) 
@@ -111,6 +123,9 @@ class GuiaRemitente(models.Model):
     numero_de_bultos = models.PositiveIntegerField(validators=[MaxValueValidator(999999), MinValueValidator(0)], verbose_name="Número de bultos",)
     transportista = models.ForeignKey(Transportista, verbose_name="Tansportista", on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.tipo_de_transporte
+
 
 
 class Destinatario(models.Model):
@@ -118,9 +133,15 @@ class Destinatario(models.Model):
     numero_documento = models.CharField(max_length=50, verbose_name="Número Documento", null=True) # Borrar el null
     nombre = models.CharField(verbose_name="Nombre Completo", max_length=100, null=True) # Borrar el null
 
+    def __str__(self):
+        return self.nombre
+
 
 class GuiaTransportista(models.Model):
     vehiculo_principal = models.CharField(max_length=50, verbose_name="TUC Vehículo principal", blank=True)
+
+    def __str__(self):
+        return self.vehiculo_principal
 
 
 class Conductor(models.Model):
@@ -131,3 +152,6 @@ class Conductor(models.Model):
     nombre = models.CharField(max_length=100, verbose_name="Nombre")
     apellidos = models.CharField(max_length=100, verbose_name="Apellidos")
     licencia = models.CharField(max_length=200, verbose_name="Licencia")
+
+    def __str__(self):
+        return self.denominacion

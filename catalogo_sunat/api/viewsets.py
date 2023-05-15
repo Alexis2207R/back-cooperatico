@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions
+from rest_framework.response import Response
 from catalogo_sunat.models import *
 from .serializers import *
 
@@ -49,3 +50,6 @@ class UbigeoViewSet(viewsets.ModelViewSet):
     queryset = Ubigeo.objects.all()
     permission_classes = [permissions.AllowAny]
     serializer_class = UbigeoSerializer
+    
+    # def list(self, request):
+    #     return Response(self.serializer_class(self.queryset, write_only=False).data)
