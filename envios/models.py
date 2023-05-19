@@ -55,6 +55,15 @@ class Dia(models.Model):
     nombre = models.CharField(max_length=50, verbose_name="Nombre", unique=True)
 
 
+class Destinatario(models.Model):
+    tipo_documento = models.ForeignKey(TipoDocumento, verbose_name="Tipo de Documento", on_delete=models.CASCADE, null=True) # Borrar el null
+    numero_documento = models.CharField(max_length=50, verbose_name="Número Documento", null=True) # Borrar el null
+    nombre = models.CharField(verbose_name="Nombre Completo", max_length=100, null=True) # Borrar el null
+
+    def __str__(self):
+        return self.nombre
+
+
 class Guia(models.Model):
     FORMATO = (
         ("A4", "Hoja A4"),
@@ -67,7 +76,7 @@ class Guia(models.Model):
     
     operacion = models.CharField(default="generar_guia", verbose_name="Operación", max_length=12)
     tipo_comprobante = models.ForeignKey(TipoComprobante,on_delete=models.CASCADE,verbose_name="Tipo de Comprobante")
-    destinatario = models.ForeignKey(Cliente, verbose_name="Destinatario / Cliente", on_delete=models.CASCADE)
+    destinatario = models.ForeignKey(Destinatario, verbose_name="Destinatario / Cliente", on_delete=models.CASCADE)
     fecha_emision = models.DateField(auto_now_add=True, verbose_name="Fecha de emisión")
     # Se puede llamar a la fecha de la siguiente la manera:
     # <p>Fecha: #{{ mi_modelo.get_fecha_formateada }}</p>
@@ -125,16 +134,6 @@ class GuiaRemitente(models.Model):
 
     def __str__(self):
         return self.tipo_de_transporte
-
-
-
-class Destinatario(models.Model):
-    tipo_documento = models.ForeignKey(TipoDocumento, verbose_name="Tipo de Documento", on_delete=models.CASCADE, null=True) # Borrar el null
-    numero_documento = models.CharField(max_length=50, verbose_name="Número Documento", null=True) # Borrar el null
-    nombre = models.CharField(verbose_name="Nombre Completo", max_length=100, null=True) # Borrar el null
-
-    def __str__(self):
-        return self.nombre
 
 
 class GuiaTransportista(models.Model):
