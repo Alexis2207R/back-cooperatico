@@ -68,3 +68,7 @@ class Ubigeo(models.Model):
     def __str__(self):
         return self.nombre
     
+
+class TipoOperacion(models.Model):
+    codigo = models.CharField(max_length=6, verbose_name="Código")
+    nombre = models.CharField(verbose_name="Nombre", max_length=100)

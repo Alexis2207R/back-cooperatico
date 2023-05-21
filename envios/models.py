@@ -21,7 +21,7 @@ class Vehiculos(models.Model):
     #     vehiculo = Vehiculo.objects.create(placa='ABC123')
     # except IntegrityError:
     #     print("Ya existe un vehículo con la placa ABC123")
-    placa = models.CharField(max_length=6, unique=True, verbose_name="Placa", null=True) # borrar el null
+    placa = models.CharField(max_length=6, unique=True, verbose_name="Placa")
     tipo = models.ForeignKey(TipoVehiculo, verbose_name="Tipo de Vehiculo", on_delete=models.CASCADE)
     marca = models.CharField(max_length=50, verbose_name="Marca")
     modelo = models.CharField(max_length=100, verbose_name="Modelo")
@@ -56,9 +56,9 @@ class Dia(models.Model):
 
 
 class Destinatario(models.Model):
-    tipo_documento = models.ForeignKey(TipoDocumento, verbose_name="Tipo de Documento", on_delete=models.CASCADE, null=True) # Borrar el null
-    numero_documento = models.CharField(max_length=50, verbose_name="Número Documento", null=True) # Borrar el null
-    nombre = models.CharField(verbose_name="Nombre Completo", max_length=100, null=True) # Borrar el null
+    tipo_documento = models.ForeignKey(TipoDocumento, verbose_name="Tipo de Documento", on_delete=models.CASCADE)
+    numero_documento = models.CharField(max_length=50, verbose_name="Número Documento")
+    nombre = models.CharField(verbose_name="Nombre Completo", max_length=100)
 
     def __str__(self):
         return self.nombre
@@ -84,14 +84,14 @@ class Guia(models.Model):
     peso_bruto_total = models.DecimalField(max_digits=22, decimal_places=10, verbose_name="Peso Bruto Total")
     peso_bruto_unidad_medida = models.CharField(max_length=3, verbose_name="Unidad de medida", choices=UNIDAD_MEDIDA)
     fecha_inicio_traslado = models.DateField(auto_now_add=True, verbose_name="Fecha de emisión")
-    placa = models.ForeignKey(Vehiculos, verbose_name="Placa del vehiculo del transportista", on_delete=models.CASCADE, null=True)# borrar el null
+    placa = models.ForeignKey(Vehiculos, verbose_name="Placa del vehiculo del transportista", on_delete=models.CASCADE)
     punto_partida = models.ForeignKey(Ubigeo, verbose_name="Punto de Partida (Ubigeo)", on_delete=models.CASCADE, max_length=6, related_name='partida_remitente')
     punto_partida_direccion = models.CharField(verbose_name="Punto de Partida (Dirección)", max_length=150)
     codigo_partida_establecimiento_sunat = models.CharField(verbose_name="Establecimiento Sunat", max_length=4)
     punto_llegada = models.ForeignKey(Ubigeo, verbose_name="Punto de Llegada (Ubigeo)", on_delete=models.CASCADE, max_length=6, related_name='llegada_remitente')
     punto_llegada_direccion = models.CharField(verbose_name="Punto de Llegada (Dirección)", max_length=150)
     codigo_llegada_establecimiento_sunat = models.CharField(verbose_name="Establecimiento Sunat", max_length=4)
-    observaciones = models.TextField(verbose_name="Observaciones")
+    observaciones = models.TextField(verbose_name="Observaciones", blank=True)
     enviar_cliente = models.BooleanField(verbose_name="Enviar automaticamente al cliente", max_length=5)
     formato_pdf = models.CharField(verbose_name="Formato", max_length=5, )
 
@@ -111,7 +111,7 @@ class Guia(models.Model):
 
 class GuiaItems(models.Model):
     guia = models.ForeignKey(Guia, on_delete=models.CASCADE) 
-    item = models.ForeignKey(Items, on_delete=models.CASCADE, null=True) # borrar el null
+    item = models.ForeignKey(Items, on_delete=models.CASCADE)
     cantidad_item = models.PositiveIntegerField(verbose_name="Cantidad")
     
     def __unicode__(self):
@@ -145,9 +145,9 @@ class GuiaTransportista(models.Model):
 
 class Conductor(models.Model):
     tipo_documento = models.ForeignKey(TipoDocumento, verbose_name="Tipo de Documento", on_delete=models.CASCADE)
-    guia = models.ForeignKey(Guia, on_delete=models.CASCADE, verbose_name="Guia", null=True)
+    guia = models.ForeignKey(Guia, on_delete=models.CASCADE, verbose_name="Guia")
     numero_documento = models.CharField(max_length=20, verbose_name="Numero del Documento")
-    denominacion = models.CharField(verbose_name="Razon o Nombre Completo (Conductor)", max_length=250, null=True)
+    denominacion = models.CharField(verbose_name="Razon o Nombre Completo (Conductor)", max_length=250)
     nombre = models.CharField(max_length=100, verbose_name="Nombre")
     apellidos = models.CharField(max_length=100, verbose_name="Apellidos")
     licencia = models.CharField(max_length=200, verbose_name="Licencia")
