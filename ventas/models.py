@@ -22,6 +22,10 @@ class Factura(models.Model):
         (10, "LEY 31556"),
         (4, "IVAP"),
     )
+    TIPO_RETENCION = (
+        (1, "Tasa 3%"),
+        (2, "Tasa 6%"),
+    )
     operacion = models.CharField(max_length=50, verbose_name="Operación", default="generar_comprobante")
     cliente = models.ForeignKey(Cliente, verbose_name="Cliente", on_delete=models.CASCADE)
     tipo_comprobante = models.ForeignKey(TipoComprobante, verbose_name="Tipo de Comprobante", on_delete=models.CASCADE)
@@ -44,12 +48,13 @@ class Factura(models.Model):
     total = models.DecimalField(max_digits=14, decimal_places=2, verbose_name="Total")
     estado_pago = models.BooleanField(verbose_name="¿Pagado?")
     tipo_percepcion = models.ForeignKey(TipoPercepcion, verbose_name="", on_delete=models.CASCADE)
-    # total_incluido_percepcion =
-    # percepcion_base_imponible =
-    # total_percepcion =
-    # tipo_retencion =
-    # total_impuestos_bosas =
-    # detraccion = 
+    percepcion_base_imponible = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Percepción Base Imponible")
+    total_percepcion = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Total Percepcion")
+    total_incluido_percepcion = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Total Percepción Incluido")
+    tipo_retencion = models.IntegerField(verbose_name="Tipo Retención", choices=TIPO_RETENCION)
+    retencion_base_imponible = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Percepción Base Imponible")
+    total_retencion = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Total Retención")
+    total_impuestos_bolsas = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Total Impuestos Bolsas")
     # observaciones = 
     # documento = 
     items = models.ManyToManyField(Items, verbose_name="Items", through="FacturaItems")

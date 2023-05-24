@@ -4,7 +4,7 @@ from inventario.models import Items
 from catalogo_sunat.models import Ubigeo, MotivoTraslado, TipoComprobante, TipoDocumento
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxLengthValidator, MinValueValidator
 
 
 class TipoVehiculo(models.Model):
@@ -35,14 +35,14 @@ class Vehiculos(models.Model):
 class Transportista(models.Model):
     tipo_documento = models.ForeignKey(TipoDocumento, verbose_name="Tipo de Documento", on_delete=models.CASCADE)
     numero_documento = models.CharField(max_length=11, verbose_name="Numero del Documento")
-    nombre = models.CharField(max_length=200, verbose_name="Nombre")
+    nombre = models.CharField(max_length=100, verbose_name="Nombre")
 
     def __str__(self):
         return self.nombre
 
 
 class Yaer(models.Model):
-    year = models.PositiveIntegerField(validators=[MaxValueValidator(2030), MinValueValidator(2000)],verbose_name="Año",unique=True,)
+    year = models.PositiveIntegerField(validators=[MaxLengthValidator(2030), MinValueValidator(2000)],verbose_name="Año",unique=True,)
 
 
 class Mes(models.Model):
@@ -57,7 +57,7 @@ class Dia(models.Model):
 
 class Destinatario(models.Model):
     tipo_documento = models.ForeignKey(TipoDocumento, verbose_name="Tipo de Documento", on_delete=models.CASCADE)
-    numero_documento = models.CharField(max_length=50, verbose_name="Número Documento")
+    numero_documento = models.CharField(max_length=15, verbose_name="Número Documento")
     nombre = models.CharField(verbose_name="Nombre Completo", max_length=100)
 
     def __str__(self):
@@ -73,39 +73,41 @@ class Guia(models.Model):
         ("KGM", "Kilogramos"),
         ("TNE", "Toneladas"),
     )
-    
+
     operacion = models.CharField(default="generar_guia", verbose_name="Operación", max_length=12)
-    tipo_comprobante = models.ForeignKey(TipoComprobante,on_delete=models.CASCADE,verbose_name="Tipo de Comprobante")
+    tipo_comprobante = models.ForeignKey(TipoComprobante, verbose_name="Tipo de Comprobante", on_delete=models.CASCADE)
     destinatario = models.ForeignKey(Destinatario, verbose_name="Destinatario / Cliente", on_delete=models.CASCADE)
+    cliente = models.ForeignKey(Cliente, verbose_name="Cliente", on_delete=models.CASCADE, null=True) # Borrar el null
     fecha_emision = models.DateField(auto_now_add=True, verbose_name="Fecha de emisión")
     # Se puede llamar a la fecha de la siguiente la manera:
     # <p>Fecha: #{{ mi_modelo.get_fecha_formateada }}</p>
-    items = models.ManyToManyField(Items, through="GuiaItems")
     peso_bruto_total = models.DecimalField(max_digits=22, decimal_places=10, verbose_name="Peso Bruto Total")
     peso_bruto_unidad_medida = models.CharField(max_length=3, verbose_name="Unidad de medida", choices=UNIDAD_MEDIDA)
     fecha_inicio_traslado = models.DateField(auto_now_add=True, verbose_name="Fecha de emisión")
     placa = models.ForeignKey(Vehiculos, verbose_name="Placa del vehiculo del transportista", on_delete=models.CASCADE)
-    punto_partida = models.ForeignKey(Ubigeo, verbose_name="Punto de Partida (Ubigeo)", on_delete=models.CASCADE, max_length=6, related_name='partida_remitente')
+    punto_partida = models.ForeignKey(Ubigeo, verbose_name="Punto de Partida (Ubigeo)", on_delete=models.CASCADE, related_name='partida_remitente')
     punto_partida_direccion = models.CharField(verbose_name="Punto de Partida (Dirección)", max_length=150)
     codigo_partida_establecimiento_sunat = models.CharField(verbose_name="Establecimiento Sunat", max_length=4)
-    punto_llegada = models.ForeignKey(Ubigeo, verbose_name="Punto de Llegada (Ubigeo)", on_delete=models.CASCADE, max_length=6, related_name='llegada_remitente')
+    punto_llegada = models.ForeignKey(Ubigeo, verbose_name="Punto de Llegada (Ubigeo)", on_delete=models.CASCADE, related_name='llegada_remitente')
     punto_llegada_direccion = models.CharField(verbose_name="Punto de Llegada (Dirección)", max_length=150)
     codigo_llegada_establecimiento_sunat = models.CharField(verbose_name="Establecimiento Sunat", max_length=4)
     observaciones = models.TextField(verbose_name="Observaciones", blank=True)
     enviar_cliente = models.BooleanField(verbose_name="Enviar automaticamente al cliente", max_length=5)
     formato_pdf = models.CharField(verbose_name="Formato", max_length=5, )
 
+    items = models.ManyToManyField(Items, through="GuiaItems")
+
     def validar_peso_bruto_total(self):
         if self.peso_bruto_total <= 0:
             raise ValidationError("El peso bruto total debe ser mayor que cero.")
 
-    def __str__(self):
+    def fecha_emision(self):
         return str(self.fecha_emision.strftime("%d-%m-%Y"))
 
     def fecha_inicio_traslado(self):
         return self.fecha_inicio_traslado.strftime("%d-%m-%Y")
 
-    def __str__(self):
+    def __unicode__(self):
         return self.tipo_comprobante
 
 
@@ -120,37 +122,40 @@ class GuiaItems(models.Model):
     # Usar los signals para disminuir un un almacen y aumentar en otro
 
 
+class Conductor(models.Model):
+    tipo_documento = models.ForeignKey(TipoDocumento, verbose_name="Tipo de Documento", on_delete=models.CASCADE)
+    numero_documento = models.CharField(max_length=15, verbose_name="Numero del Documento")
+    denominacion = models.CharField(verbose_name="Razon o Nombre Completo (Conductor)", max_length=100)
+    nombre = models.CharField(max_length=250, verbose_name="Nombre")
+    apellidos = models.CharField(max_length=250, verbose_name="Apellidos")
+    licencia = models.CharField(max_length=10, validators=[MinValueValidator(9), MaxLengthValidator(10)], verbose_name="Licencia")
+
+    def __str__(self):
+        return self.denominacion
+
+
 class GuiaRemitente(models.Model):
     TIPO_TRANSPORTE = (
         ("01", "TRANSPORTE PÚBLICO"),
         ("02", "TRANSPORTE PRIVADO"),
     )
+    numero = models.CharField(max_length=10, verbose_name="N°", null=True) # Quitar null
     guia = models.ForeignKey(Guia, verbose_name="Datos Generales de la Guia", on_delete=models.CASCADE)
     tipo_de_transporte = models.CharField(max_length=2, choices=TIPO_TRANSPORTE)
     motivo_traslado = models.ForeignKey(MotivoTraslado, on_delete=models.CASCADE, verbose_name="Motivo de Traslado")
     motivo_traslado_otro = models.CharField(max_length=70, verbose_name="Otro Motivo de Traslado", blank=True)
-    numero_de_bultos = models.PositiveIntegerField(validators=[MaxValueValidator(999999), MinValueValidator(0)], verbose_name="Número de bultos",)
+    numero_de_bultos = models.PositiveIntegerField(validators=[MaxLengthValidator(999999), MinValueValidator(0)], verbose_name="Número de bultos",)
     transportista = models.ForeignKey(Transportista, verbose_name="Tansportista", on_delete=models.CASCADE)
+    conductor = models.ForeignKey(Conductor, verbose_name="Conductor", on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return self.tipo_de_transporte
+        return self.numero
 
 
 class GuiaTransportista(models.Model):
-    vehiculo_principal = models.CharField(max_length=50, verbose_name="TUC Vehículo principal", blank=True)
+    numero = models.CharField(max_length=10, verbose_name="N°", null=True) # Quitar null
+    vehiculo_principal = models.CharField(max_length=15, validators=[MinValueValidator(10), MaxLengthValidator(15)], verbose_name="TUC Vehículo principal", null=True, blank=True)
+    conductor = models.ForeignKey(Conductor, verbose_name="Conductor", on_delete=models.CASCADE, null=True) # Borrar el null
 
     def __str__(self):
         return self.vehiculo_principal
-
-
-class Conductor(models.Model):
-    tipo_documento = models.ForeignKey(TipoDocumento, verbose_name="Tipo de Documento", on_delete=models.CASCADE)
-    guia = models.ForeignKey(Guia, on_delete=models.CASCADE, verbose_name="Guia")
-    numero_documento = models.CharField(max_length=20, verbose_name="Numero del Documento")
-    denominacion = models.CharField(verbose_name="Razon o Nombre Completo (Conductor)", max_length=250)
-    nombre = models.CharField(max_length=100, verbose_name="Nombre")
-    apellidos = models.CharField(max_length=100, verbose_name="Apellidos")
-    licencia = models.CharField(max_length=200, verbose_name="Licencia")
-
-    def __str__(self):
-        return self.denominacion

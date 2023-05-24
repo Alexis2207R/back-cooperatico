@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Conductor, Cliente, TipoVehiculo, Vehiculos, Transportista, Guia
+from .models import Conductor, Cliente, TipoVehiculo, Vehiculos, Transportista, Guia, GuiaRemitente, GuiaTransportista
 
 
 class ClienteAdmin(admin.ModelAdmin):
@@ -38,7 +38,19 @@ admin.site.register(Transportista, TransportistaAdmin)
 
 
 class GuiaAdmin(admin.ModelAdmin):
-    list_display = ('tipo_comprobante',) 
+    list_display = ('id',) 
     search_fields = ('fecha_emision', 'destinatario', 'placa',)
 
 admin.site.register(Guia, GuiaAdmin)
+
+
+class GuiaRemitenteAdmin(admin.ModelAdmin):
+    list_display = ('numero',) 
+
+admin.site.register(GuiaRemitente, GuiaRemitenteAdmin)
+
+
+class GuiaTransportistaAdmin(admin.ModelAdmin):
+    list_display = ('numero',) 
+
+admin.site.register(GuiaTransportista, GuiaTransportistaAdmin)

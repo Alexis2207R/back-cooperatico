@@ -11,7 +11,7 @@ class CategoriaItem(models.Model):
 
 
 class TipoItem(models.Model):
-    nombre = models.CharField(verbose_name="Tipo Item", max_length=100)
+    nombre = models.CharField(verbose_name="Tipo Item", max_length=100) # Puede ser un producto o servicio
 
     def __str__(self):
         return self.nombre

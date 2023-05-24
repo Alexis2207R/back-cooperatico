@@ -35,7 +35,7 @@ class GuiaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def __str__(self):
-        return self.tipo_comprobante
+        return self.id
 
 
 class GuiaRemitenteSerializer(serializers.ModelSerializer):
@@ -44,7 +44,7 @@ class GuiaRemitenteSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     def __str__(self):
-        return self.tipo_de_transporte
+        return self.numero
 
 
 class DestinatarioSerializer(serializers.ModelSerializer):
@@ -62,7 +62,7 @@ class GuiaTransportistaSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     def __str__(self):
-        return self.vehiculo_principal
+        return self.numero
 
 
 class ConductorSerializer(serializers.ModelSerializer):
