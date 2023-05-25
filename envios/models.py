@@ -128,10 +128,10 @@ class Conductor(models.Model):
     denominacion = models.CharField(verbose_name="Razon o Nombre Completo (Conductor)", max_length=100)
     nombre = models.CharField(max_length=250, verbose_name="Nombre")
     apellidos = models.CharField(max_length=250, verbose_name="Apellidos")
-    licencia = models.CharField(max_length=10, validators=[MinValueValidator(9), MaxLengthValidator(10)], verbose_name="Licencia")
+    licencia = models.CharField(max_length=10, verbose_name="Licencia")
 
     def __str__(self):
-        return self.denominacion
+        return self.nombre
 
 
 class GuiaRemitente(models.Model):

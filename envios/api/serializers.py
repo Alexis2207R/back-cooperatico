@@ -71,4 +71,4 @@ class ConductorSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     def __str__(self):
-        return self.denominacion
+        return self.numero_documento
