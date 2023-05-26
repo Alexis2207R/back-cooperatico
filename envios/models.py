@@ -37,6 +37,20 @@ class Transportista(models.Model):
     numero_documento = models.CharField(max_length=11, verbose_name="Numero del Documento", unique=True)
     nombre = models.CharField(max_length=100, verbose_name="Nombre")
 
+    def create_conductor(request):
+    # Lógica para crear el conductor y validar el campo numero_documento
+        try:
+            # Tu lógica de validación aquí
+            
+            # Si el campo numero_documento ya está registrado
+            return JsonResponse({'error': 'El número de documento ya está registrado'}, status=400)
+            
+            # Si no hay errores de validación
+            return JsonResponse({'success': 'El conductor se registró correctamente'})
+    
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
     def __str__(self):
         return self.nombre
 
@@ -59,6 +73,20 @@ class Destinatario(models.Model):
     tipo_documento = models.ForeignKey(TipoDocumento, verbose_name="Tipo de Documento", on_delete=models.CASCADE)
     numero_documento = models.CharField(max_length=15, verbose_name="Número Documento")
     nombre = models.CharField(verbose_name="Nombre Completo", max_length=100)
+
+    def create_conductor(request):
+    # Lógica para crear el conductor y validar el campo numero_documento
+        try:
+            # Tu lógica de validación aquí
+            
+            # Si el campo numero_documento ya está registrado
+            return JsonResponse({'error': 'El número de documento ya está registrado'}, status=400)
+            
+            # Si no hay errores de validación
+            return JsonResponse({'success': 'El conductor se registró correctamente'})
+    
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
     def __str__(self):
         return self.nombre
@@ -168,7 +196,7 @@ class GuiaRemitente(models.Model):
 
 class GuiaTransportista(models.Model):
     numero = models.CharField(max_length=10, verbose_name="N°", null=True) # Quitar null
-    vehiculo_principal = models.CharField(max_length=15, validators=[MinValueValidator(10), MaxLengthValidator(15)], verbose_name="TUC Vehículo principal", null=True, blank=True)
+    vehiculo_principal = models.CharField(max_length=15, verbose_name="TUC Vehículo principal", null=True, blank=True)
     conductor = models.ForeignKey(Conductor, verbose_name="Conductor", on_delete=models.CASCADE, null=True) # Borrar el null
 
     def __str__(self):
