@@ -34,7 +34,7 @@ class Vehiculos(models.Model):
 
 class Transportista(models.Model):
     tipo_documento = models.ForeignKey(TipoDocumento, verbose_name="Tipo de Documento", on_delete=models.CASCADE)
-    numero_documento = models.CharField(max_length=11, verbose_name="Numero del Documento")
+    numero_documento = models.CharField(max_length=11, verbose_name="Numero del Documento", unique=True)
     nombre = models.CharField(max_length=100, verbose_name="Nombre")
 
     def __str__(self):
@@ -124,11 +124,25 @@ class GuiaItems(models.Model):
 
 class Conductor(models.Model):
     tipo_documento = models.ForeignKey(TipoDocumento, verbose_name="Tipo de Documento", on_delete=models.CASCADE)
-    numero_documento = models.CharField(max_length=15, verbose_name="Numero del Documento")
+    numero_documento = models.CharField(max_length=15, verbose_name="Numero del Documento", unique=True)
     denominacion = models.CharField(verbose_name="Razon o Nombre Completo (Conductor)", max_length=100)
     nombre = models.CharField(max_length=250, verbose_name="Nombre")
     apellidos = models.CharField(max_length=250, verbose_name="Apellidos")
     licencia = models.CharField(max_length=10, verbose_name="Licencia")
+
+    def create_conductor(request):
+    # Lógica para crear el conductor y validar el campo numero_documento
+        try:
+            # Tu lógica de validación aquí
+            
+            # Si el campo numero_documento ya está registrado
+            return JsonResponse({'error': 'El número de documento ya está registrado'}, status=400)
+            
+            # Si no hay errores de validación
+            return JsonResponse({'success': 'El conductor se registró correctamente'})
+    
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
     def __str__(self):
         return self.nombre
